@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
 
-export default () => {
+export default (i18n) => {
   const state = {
     rss: '',
     errorsList: [],
@@ -13,6 +13,7 @@ export default () => {
 
   const form = document.querySelector('.rss-form');
   const userInputEl = form.elements.url;
+  const userLabel = form.querySelector('label');
   const errorFeedbackEl = document.querySelector('.feedback');
 
   function render() {
@@ -30,6 +31,8 @@ export default () => {
 
   const watchedState = onChange(state, render);
 
+  userLabel.textContent = i18n.t('rssForm.name');
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -38,9 +41,9 @@ export default () => {
     watchedState.rss = userInputEl.value;
 
     const schema = yup.string()
-      .required('This field can not be empty')
-      .url('Value must be a valid URL')
-      .notOneOf(watchedState.rssList, 'Value is already in the RSS list');
+      .required(i18n.t('rssForm.errors.notEmpty'))
+      .url(i18n.t('rssForm.errors.notUrl'))
+      .notOneOf(watchedState.rssList, i18n.t('rssForm.errors.noDuplication'));
 
     schema.validate(watchedState.rss)
       .then(() => {
