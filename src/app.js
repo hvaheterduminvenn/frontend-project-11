@@ -13,6 +13,7 @@ export default (i18n) => {
     feeds: [],
     posts: [],
     modalData: null,
+    previewedPostId: null,
   };
 
   const form = document.querySelector('.rss-form');
@@ -64,7 +65,7 @@ export default (i18n) => {
         value.forEach((post) => {
           const postItemEl = document.createElement('li');
           postItemEl.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-          postItemEl.innerHTML = `<a href="${post.href}" class="fw-normal link-secondary" data-id="${post.postId}" target="_blank" rel="noopener noreferrer">
+          postItemEl.innerHTML = `<a href="${post.href}" class="fw-bold" data-id="${post.postId}" target="_blank" rel="noopener noreferrer">
             ${post.title}
           </a>`;
 
@@ -93,11 +94,18 @@ export default (i18n) => {
           modalEl.querySelector('.modal-title').textContent = value.title;
           modalEl.querySelector('.modal-body').textContent = value.description;
           modalEl.querySelector('.modal-footer a').href = value.href;
+          this.previewedPostId = value.postId;
         } else {
           modalEl.querySelector('.modal-title').textContent = '';
           modalEl.querySelector('.modal-body').textContent = '';
           modalEl.querySelector('.modal-footer a').href = '';
         }
+      }
+
+      if (path === 'previewedPostId') {
+        const previewedPost = document.querySelector(`[data-id="${value}"`);
+        previewedPost.classList.remove('fw-bold');
+        previewedPost.classList.add('fw-normal', 'link-secondary');
       }
     }
   }
