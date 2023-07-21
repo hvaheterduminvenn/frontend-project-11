@@ -128,18 +128,44 @@ export default (i18n) => {
     schema
       .validate(watchedState.rss)
       .then(() => {
-        watchedState.rssList.push(watchedState.rss);
-      })
-      .then(() => {
-        parse(watchedState.rss).then((data) => {
-          watchedState.feeds.unshift(data.feed);
-          watchedState.posts = [...data.posts, ...watchedState.posts];
-        });
-
-        watchedState.rssList.push(watchedState.rss);
+        parse(watchedState.rss)
+          .then((data) => {
+            watchedState.rssList.push(watchedState.rss);
+            watchedState.feeds.unshift(data.feed);
+            watchedState.posts = [...data.posts, ...watchedState.posts];
+          })
+          .catch((parseError) => {
+            watchedState.errorsList.push(parseError.message);
+          });
       })
       .catch((error) => {
         watchedState.errorsList.push(error.message);
       });
   });
+
+  const updateRate = 5000;
+
+  const customSetInterval = (cb, interval) => {
+    setTimeout(() => {
+      cb();
+      customSetInterval(cb, interval);
+    }, interval);
+  };
+
+  customSetInterval(() => {
+    console.log('Updating posts');
+    if (watchedState.feeds.length > 0) {
+      watchedState.feeds.forEach((feed) => {
+        parse(feed.url).then((data) => {
+          data.posts.forEach((post) => {
+            const duplicatePost = watchedState.posts
+              .find((statePost) => statePost.title === post.title);
+            if (!duplicatePost) {
+              watchedState.posts.unshift(post);
+            }
+          });
+        });
+      });
+    }
+  }, updateRate);
 };

@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export default (urlRss) => axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(urlRss)}`)
   .then((response) => {
+    // console.log(response);
     if (response.status === 200) {
       return response.data.contents;
     }
@@ -14,6 +15,7 @@ export default (urlRss) => axios.get(`https://allorigins.hexlet.app/get?url=${en
 
     const feed = {
       id: uuidv4(),
+      url: urlRss,
       title: rssDocument.documentElement.querySelector('channel title').textContent,
       description: rssDocument.documentElement.querySelector('channel description').textContent,
     };
